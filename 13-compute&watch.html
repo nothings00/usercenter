@@ -1,0 +1,74 @@
+<script src="https://unpkg.com/vue@next"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+
+<div id="app">
+  <p>Has published books:</p>
+  <!-- 1、计算属性 -->
+  <span>{{publishedBooksMessage}}</span>
+  <p>{{title}}</p>
+  <p>{{now}}</p>
+  <p>{{count}}</p>
+  <!-- 2、侦听器 -->
+  <p>Ask a yes/no question:
+    <input v-model = "question"/>
+  </p>
+  <p>{{answer}}</p>
+</div>
+<script>
+  const vm = Vue.createApp({
+    data(){
+      return {
+        author: {
+          name: 'John Doe',
+          books: [
+            'Vue 2 - Advanced Guide',
+            'Vue 3 - Basic Guide',
+            'Vue 4 - The Mystery'
+          ]
+        },
+        count: 0,
+        question:'',
+        answer: 'Questions usually contain a question mark. ;-)'
+      }
+    },
+    computed: {
+      // 1.1 基本例子
+      publishedBooksMessage(){
+        return this.author.books.length > 0 ? 'Yes' : 'No'
+      },
+      //1.2 计算属性缓存
+      now(){
+        return Date.now()
+      },
+      // 1.3 计算属性setter
+      title: {
+        get(){
+          return this.author.name
+        },
+        set(newValue) {
+          this.count++
+        }
+      }
+    },
+    // 计算属性适用于数据随其他数据而变动，便利一些，watch更通用
+    watch:{
+      question(newQ,oldQ){
+        if(newQ.indexOf('?')>-1){
+          this.getAnswer()
+        }
+      }
+    },
+    methods:{
+      getAnswer(){
+        this.answer = 'Thinking ...'
+        axios.get("httpS://yesno.wtf/api")
+        .then(resp => {
+          this.answer = resp.data.answer
+        })
+        .catch(error => {
+          this.answer = 'Error! Could not reach the API.' + error
+        })
+      }
+    }
+  }).mount('#app')
+</script>

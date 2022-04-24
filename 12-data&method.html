@@ -1,0 +1,43 @@
+<script src="https://unpkg.com/vue@next"></script>
+<!-- Vue 没有内置支持防抖和节流，但可以使用 Lodash 等库来实现。 -->
+<script src="https://unpkg.com/lodash@4.17.20/lodash.min.js"></script>
+
+<div id="app">
+  count: {{count}}
+  <br/>
+  <button @click="debounce">debounce+1</button>
+  <button @click="throttle">throttle+1</button>
+</div>
+
+<script>
+  const app = Vue.createApp({
+    data() {
+      return { count:4 }
+    },
+    methods: {
+      // 2、方法
+      increment() {
+        //this指向该组件实例
+        this.count ++;
+      },
+      // 防抖
+      debounce: _.debounce(function(){
+          this.count++
+      },500),
+      // 节流
+      throttle: _.throttle(function(){
+         this.count++
+      },500)
+    }
+  })
+  const vm = app.mount('#app')
+  // 1、Data Property
+  console.log(vm.$data.count)
+  console.log(vm.count)
+
+  vm.count = 5
+  console.log(vm.$data.count)
+
+  vm.$data.count = 6
+  console.log(vm.count)
+</script>

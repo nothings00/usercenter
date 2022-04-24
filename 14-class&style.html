@@ -1,0 +1,82 @@
+<script src="https://unpkg.com/vue@next"></script>
+<!-- 1、绑定HTML class -->
+<!-- 在根组件上写内联对象不生效 -->
+<div id="app" >
+  <!-- 1.1 对象语法 -->
+  <div>
+    <!-- 1.1.1 内联对象 -->
+    <div :class="{active: isActive}"></div>
+    <!-- 1.1.2 与普通class共存 -->
+    <div class="static" :class="{active: isActive,'text-danger': hasError}"></div>
+    <!-- 1.1.3 绑定数据对象 -->
+    <div :class="classObject"></div>
+    <!-- 1.1.4 计算属性对象 -->
+    <div :class="classCompute"></div>
+  </div>
+  <!-- 1.2数组语法 -->
+  <div>
+    <div :class="[activeClass,errorClass]"></div>
+  </div>
+
+</div>
+
+<script>
+const HtmlApp ={
+  data() {
+    return {
+      activeClass: 'active',
+      errorClass: 'text-danger',
+      isActive: true,
+      hasError: false,
+      error: null,
+      classObject: {
+        active: true,
+        'text-danger': false
+      }
+    }
+  },
+  computed: {
+    classCompute(){
+      return {
+        active: this.isActive && !this.hasError,
+        'text-danger': this.error && this.error.type ==='fatal'
+      }
+    }
+  }
+}
+
+const app = Vue.createApp(HtmlApp)
+const vm = app.mount('#app')
+</script>
+
+<!-- 2、绑定内联样式 -->
+<div id="style">
+  <!-- 2.1对象语法 -->
+  <!-- 2.2.1 内联对象 -->
+  <div :style="{color:activeColor,fontSize: fontSize + 'px'}">Object</div>
+  <!-- 2.1.2 普通对象 -->
+  <div :style="styleObject">Common</div>
+  <!-- 2.1.3 计算属性，同1.1.4-->
+  <!-- 2.2数组语法 -->
+  <div :style="[baseStyles,ovveridingStyles]"></div>
+  <!-- 2.3自动添加前缀 TODO:没找到合适的css-->
+  <div :style="{transition: transition}"></div>
+  <!-- 2.4多重值 -->
+  <div :style="{display:['-webkit-box','-ms-flexbox','flex']}"></div>
+</div>
+<script>
+  const StyleApp={
+    data(){
+      return {
+        activeColor: 'red',
+        fontSize: 30,
+        transition: 'all 4s ease',
+        styleObject: {
+          color: 'red',
+          fontSize: '13px'
+        }
+      }
+    }
+  }
+  Vue.createApp(StyleApp).mount('#style')
+</script>

@@ -1,0 +1,30 @@
+<script src="https://unpkg.com/vue@next"></script>
+
+<div id="hello-vue" class="demo">
+    {{message}}
+</div>
+
+<style>
+.demo {
+    font-family: sans-serif;
+    border: 1px solid #eee;
+    border-radius: 2px;
+    padding: 20px 30px;
+    margin-top: 1em;
+    user-select: none;
+    overflow-x: auto;
+}
+</style>
+
+<script>
+const HelloVueApp = {
+    data() {
+        return {
+            message : 'Hello Vue!!'
+        }
+    }
+}
+
+Vue.createApp(HelloVueApp).mount('#hello-vue')
+
+</script>
