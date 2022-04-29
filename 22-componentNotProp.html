@@ -1,0 +1,71 @@
+<!-- 深入组件 -->
+<script src="https://unpkg.com/vue@next"></script>
+
+<!-- 非Prop的Attribute -->
+<!-- 
+   一个非 prop 的 attribute 是指传向一个组件，
+  但是该组件并没有相应 props 或 emits 定义的 attribute。
+  常见的示例包括 class、style 和 id attribute。可以通过 $attrs property 访问那些 attribute
+-->
+<div>
+  <!-- 1.Attribute继承 -->
+  <!--  当组件返回单个根节点时，非 prop 的 attribute 将自动添加到根节点的 attribute 中,监听事件同理 -->
+  <!-- 具有非 prop 的 attribute 的 date-picker 组件-->
+  <date-picker data-status="activated"></date-picker>
+  <!-- 渲染后的 date-picker 组件 -->
+  <div class="date-picker" data-status="activated">
+    <input type="datetime-local" />
+  </div>
+  <!-- 2.禁用Attribute继承 -->
+  <!-- 不希望组件的根元素继承 attribute，可以在组件的选项中设置 inheritAttrs: false -->
+  <!-- date-picker 组件使用非 prop 的 attribute -->
+  <date-picker2 data-status="activated"></date-picker>
+  <!-- 渲染后的 date-picker 组件 -->
+  <div class="date-picker">
+    <input type="datetime-local" data-status="activated" />
+  </div>          
+  <!-- 3.多个根结点上的Attribute继承 -->
+  <!-- 
+    与单个根节点组件不同，
+    具有多个根节点的组件不具有自动 attribute fallthrough (隐式贯穿) 行为。
+    如果未显式绑定 $attrs，将发出运行时警告 
+  -->
+  <custom-layout id="custom-layout" @click="changeValue"></custom-layout>
+  <!-- 
+    // 这将发出警告
+  app.component('custom-layout', {
+    template: `
+      <header>...</header>
+      <main>...</main>
+      <footer>...</footer>
+    `
+  })
+
+  // 没有警告，$attrs 被传递到 <main> 元素
+  app.component('custom-layout', {
+    template: `
+      <header>...</header>
+      <main v-bind="$attrs">...</main>
+      <footer>...</footer>
+    `
+  })
+   -->
+
+</div>
+<script>
+  app.component('date-picker',{
+    template: `
+      <div class="date-picker">
+        <input type="datetime-loacl" />
+      </div>
+    `
+  }),
+  app.component('date-picker2', {
+  inheritAttrs: false,
+  template: `
+    <div class="date-picker">
+      <input type="datetime-local" v-bind="$attrs" />
+    </div>
+  `
+  })
+</script>

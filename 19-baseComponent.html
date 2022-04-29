@@ -1,0 +1,134 @@
+<!-- 组件基础 -->
+<script src="https://unpkg.com/vue@next"></script>
+<div id="app">
+  <div id="components-demo">
+    <!-- 1.基本示例 -->
+    <button-counter></button-counter>
+    <!-- 2.组件的复用 -->
+    <!-- 每用一次组件，就会有一个它的新实例被创建 -->
+    <button-counter></button-counter>
+    <button-counter></button-counter>
+    <button-counter></button-counter>
+    <!-- 3.组件的组织 -->
+    <!-- 通常一个应用会以一棵嵌套的组件树的形式来组织 -->
+  </div>
+  <!-- 4.通过Prop向子组件传递数据 -->
+  <!-- 一个值被传递给一个 prop attribute 时，它就成为该组件实例中的一个 property -->
+  <div id="blog-post-demo" class="demo">
+    <blog-post title="My journey with Vue"></blog-post>
+    <blog-post title="Blogging with Vue"></blog-post>
+    <blog-post title="Why Vue is so fun"></blog-post>
+    <blog-post v-for="post in posts" :key="post.id" :title="post.title"></blog-post>
+  </div>
+  <!-- 5.监听子组件事件 -->
+  <div id="blog-post-events-demo">
+    <div :style="{ fontSize: postFontSize + 'em'}">
+      <!-- 因为浏览器会把attribute都变成小写，所以enlargeText监听写成enlarge-text，不要写成enlargeText -->
+      <!-- 5.1 使用事件抛出一个值 -->
+      <!-- 通过$event访问或者通过方法第一个参数接收 -->
+      <blog-post 
+        v-for="post in posts"
+        :key="post.id"
+        :title="post.title"
+        @enlarge-text="postFontSize += $event,onEnlargeText($event)">
+      </blog-post>
+      <!-- 5.2 在组件上使用v-model -->
+      <custom-input
+        :model-value="searchText"
+        @update:model-value="searchText = $event">
+      </custom-input>
+      <custom-input-computed
+        :model-value="searchText">
+      </custom-input-computed>
+    </div>
+  </div>
+   <!-- 6.通过插槽分发内容 -->
+   <alert-box>
+    Something bad happened.
+  </alert-box>
+  <!-- 7.动态组件 -->
+  <!-- currentTabComponent可以是一个已注册组件名或一个组件选项对象 -->
+  <component :is="currentTabComponent"></component>
+  <!-- 8.解析DOM模版时的注意事项 -->
+  <!-- 字符串模版、单文件组件、<script type="text/x-template"> 之外的情况 -->
+  <!-- 8.1 元素位置受限 -->
+  <!-- <ul> <ol>  <table> <select> 限制内部元素-->
+  <!-- <li> <tr> <option> 限制父元素 -->
+  <table>
+    <tr is="vue:blog-post-row"></tr>
+  </table>
+  <!-- 8.2 大小写不敏感 -->
+  <!-- HTML attribute 名不区分大小写，因此浏览器将所有大写字符解释为小写 -->
+  <!-- 在 DOM 模板中使用时，驼峰 prop 名称和 event 处理器参数需要使用它们的 kebab-cased (横线字符分隔) 等效值 -->
+  
+</div>
+<script>
+  // 创建一个Vue应用
+  const app = Vue.createApp({
+    data(){
+      return {
+        posts: [
+          { id: 1, title: 'My journey with Vue'},
+          { id: 2, title: 'Blogging with Vue'},
+          { id: 3, title: 'Why Vue is so fun'}
+        ],
+        postFontSize: 1,
+        searchText: ''
+      }
+    },
+    methods:{
+      onEnlargeText(enlargeAmount){
+          console.log(enlargeAmount)
+      }
+    }
+  })
+  // 定义一个名为button-counter的新全局组件
+  app.component('button-counter',{
+    data(){
+      return {
+        count: 0
+      }
+    },
+    template: `<button @click="count++">
+                You clicked me {{ count }} times.
+                </button>`
+  })
+  app.component('blog-post',{
+    props: ['title'],
+    emits: ['enlargeText'],
+    template:`<div class="blog-post">
+                <h4>{{title}}</h4>
+                <button @click="$emit('enlargeText',0.1)"> Enlarge text </button>
+              </div>`
+  })
+  app.component('custom-input',{
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
+    template:` <input :value="modelValue"
+                @input="$emit('update:modelValue',$event.target.value)">
+              `
+  })
+  app.component('custom-input-computed',{
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
+    template: `<input v-model="value">`,
+    computed:{
+      value:{
+        get(){
+          return this.modelValue
+        },
+        set(value){
+          this.$emit('update:modelValue',value)
+        }
+      }
+    }
+  })
+  app.component('alert-box',{
+    template:`<div class="demo-alert-box">
+                <strong>Error!</strong>
+                <slot></slot>
+              </div>`
+  })
+  vm = app.mount('#app')
+  
+</script>

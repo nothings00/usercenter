@@ -1,0 +1,133 @@
+<!-- 深入组件 -->
+<script src="https://unpkg.com/vue@next"></script>
+<!-- 自定义事件 -->
+
+<div id="app"> 
+  <!-- 1.事件名 -->
+  <!-- 
+    与组件和 prop 一样，事件名提供了自动的大小写转换。
+    如果在子组件中触发一个以 camelCase (驼峰式命名) 命名的事件，
+    你将可以在父组件中添加一个 kebab-case (短横线分隔命名) 的监听器  
+  -->
+  <custom-form1 @my-event="doSomething"></custom-form1>
+  <!-- 3.v-model参数 -->
+  <!-- 默认情况下，组件上的 v-model 使用 modelValue 作为 prop 和 update:modelValue 作为事件 -->
+  <my-component3 v-model:title="bookTitle"></my-component3>
+  <!-- 4.多个v-model绑定 -->
+  <!-- 5.处理v-model修饰符 -->
+  <!-- 对于带参数的 v-model 绑定，生成的 prop 名称将为 arg + "Modifiers -->
+  <my-component5 v-model.capitalize="myText"></my-component5>
+  {{ myText }}
+  <my-component6 v-model:description.abcd="myText"></my-component6>
+</div>
+<script>
+  const app = Vue.createApp({
+    data(){
+      return {
+        myText: '',
+        bookTitle: ''
+      }
+    },
+    methods: {
+      doSomething(){
+        console.log('doSomething...')
+      }
+    }
+  })
+  // 2.定义自定义事件
+  app.component('custom-form1', {
+    // 当在 emits 选项中定义了原生事件 (如 click) 时，将使用组件中的事件替代原生事件侦听器。
+    emits: ['inFocus', 'submit']
+  })
+  // 2.1 验证抛出事件
+  // 要添加验证，请为事件分配一个函数，该函数接收传递给 $emit 调用的参数，并返回一个布尔值以指示事件是否有效
+  app.component('custom-form2',{
+    emits:{
+      // 没有验证
+      check: null,
+      // 验证submit事件
+      submit: ({ email,passowrd}) => {
+        if(email && password){
+          return true
+        } else {
+          console.warn('Invalid submit event payload!')
+          return false
+        }
+      },
+      methods: {
+        submitForm(email,password) {
+          this.$emit('submit',{ eamil, password })
+        }
+      }
+    }
+  })
+  app.component('my-component3',{
+    props: {
+      title: String
+    },
+    emits: ['update:title'],
+    template:`
+      <input 
+        type="text"
+        :value="title"
+        @input="$emit('update:title',$event.target.value)">
+    `
+  })
+  app.component('user-name',{
+    props: {
+      fisrtName: String,
+      lastName: String
+    },
+    emits: ['update:fisrtName','update:lastName'],
+    template: `
+      <input 
+        type="text"
+        :value="fisrtName"
+        @input="$emit('update:firstName',$event.target.value)">
+      
+      <input
+        type="text"
+        :value="lastName"
+        @input="$emit('update:lastName',$event.target.value)">
+    `
+  })
+  app.component('my-component5',{
+    props: {
+      modelValue: String,
+      modelModifiers: {
+        default: () => ({})
+      }
+    },
+    emits:['update:modelValue'],
+    template: `
+        <input type="text"
+          :value="modelValue"
+          @input="emitValue">
+      `,
+    created() {
+      console.log(this.modelModifiers) //{capitalize: true}
+    },
+    methods: {
+      emitValue(e) {
+        let value = e.target.value
+        if(this.modelModifiers.capitalize){
+          value = value.charAt(0).toUpperCase()+value.slice(1)
+        }
+        this.$emit('update:modelValue',value)
+      }
+    }
+  })
+  app.component('my-component6',{
+    props:['description','descriptionModifiers'],
+    emits: ['update:description'],
+    template:`
+      <input type="text"
+        :value="description"
+        @input="$emit('update:description',$event.target.value)">
+    `,
+    created() {
+      console.log(this.descriptionModifiers)
+    }
+  })
+  app.mount('#app')
+</script>

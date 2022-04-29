@@ -1,0 +1,36 @@
+<!-- 动态组件 & 异步组件 -->
+<script src="https://unpkg.com/vue@next"></script>
+
+<div  id="app">
+  <!-- 1.在动态组件上使用 keep-alive -->
+  <!-- 希望动态组件在第一次被创建的时候换成下来 -->
+  <!-- 可以用一个<keep-alive>元素将其动态组件包裹起来 -->
+  <!-- 失活的组件将会被缓存 -->
+  <keep-alive>
+    <component :is=""currentTabCOmponent"></component>
+  </keep-alive>
+  
+  
+</div>
+
+<script>
+  // 2.异步组件
+  // 大型应用中，我们可能需要将应用分割成小一些的代码块，并且只在需要的时候才从服务器加载一个模块
+  // Vue有一个defineAsyncComponent方法，从服务器检索组件定义后，调用Promise的resolve回调
+  // 局部组件也可以使用
+  // 2.1 与Suspense一起使用
+  // 异步组件在默认情况下上可挂起的
+  // 在选项中指定，suspensible:false，异步组件可以推出Suspense控制，并始终控制自己的加载状态
+  const { createApp, definAsyncComponent } = Vue
+  const app = createApp({})
+  // 方法接受一个返回Promise的工厂函数
+  const AsyncComp = definAsyncComponent(
+    () => 
+      new Promise((resolve,reject) => {
+        resolve({
+          template: '<div> I am async! </div>'
+        })
+      })
+  )
+  app.component('async-example',AsyncComp)
+</script>

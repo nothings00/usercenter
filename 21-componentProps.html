@@ -1,0 +1,166 @@
+<!-- 深入组件 -->
+<script src="https://unpkg.com/vue@next"></script>
+
+<!-- Props -->
+<div id="Props"> 
+  <!-- 1.Prop类型 -->
+    <!-- 1.1 以字符串数组形式列出的 prop  -->
+    <!-- props: ['title', 'likes', 'isPublished', 'commentIds', 'author'] -->
+    <!-- 1.2 以对象形式列出 prop -->
+    <!-- 
+      props: {
+      title: String,
+      likes: Number,
+      isPublished: Boolean,
+      commentIds: Array,
+      author: Object,
+      callback: Function,
+      contactsPromise: Promise // 或任何其他构造函数
+    }
+    -->
+
+  <!-- 2.传递静态或动态的Prop -->
+    <!-- 2.1 传入一个数字 -->
+    <!-- 即便‘42’是静态的，我们仍需通过‘v-bind’来告诉Vue，这是一个JavaScript表达式，而不是一个字符串 -->
+    <blog-post :likes="42"></blog-post>
+    <!-- 用歺一个变量进行动态赋值 -->
+    <blog-post :likes="post.likes"></blog-post>
+
+    <!-- 2.2传入一个布尔值 -->
+    <!-- 包含该prop没有值的情况在哪，都意味着‘true’ -->
+    <!-- 如果没有在props把is-published的类型设置为Boolean，则这里的值为空字符串，而不是‘true’ -->
+    <blog-post is-published></blog-post>
+    <!-- 即便‘false’是经他ID，我们仍需通过‘v-bind’告诉Vue。这是一个JavaScript表达式，而不是一个字符串 -->
+    <blog-post :is-published="false"></blog-post>
+    <!-- 用一个变量动态赋值 -->
+    <blog-post :is-published="post.isPublished"></blog-post>
+    
+    <!-- 2.3 传入一个数组-->
+    <!-- 即便数组是静态的，我们仍需通过v-bind来告诉VUe，这是一个JavaScritpt表达式，而不是一个字符串 -->
+    <blog-post :comment-ids="[234,266,273]"></blog-post>
+    <!-- 用一个变量进行动态赋值 -->
+    <blog-post :comment-ids="post.commentIds"></blog-post>
+
+    <!-- 2.4 传入一个对象 -->
+    <!-- 即便对象是静态的，我们仍需通过v-bind来告诉Vue，这是一个JavaScript表达式，而不是一个字符串 -->
+    <blog-post :author="{name: 'Veronica',company:'Verdian Dynamics'}"></blog-post>
+    <!-- 用一个变量进行动态赋值 -->
+    <blog-post :author="post.author"></blog-post>
+    <!-- 2.5传入一个对象所有property -->
+    <!-- 使用不带参数的v-binds -->
+    <blog-post v-bind="post"></blog-post>
+    <!-- 等价于 -->
+    <blog-post :id="post.id" :title="post.title"></blog-post>
+    <!-- 3.单向数据流 -->
+    <!-- 不应该在一个子组件内部改变 prop -->
+    <!-- 3.1.prop用来传递一个初始值，且作为本地的prop来使用 -->
+    <!-- 本地data property
+      props: ['initialCounter'],
+      data() {
+        return {
+          counter: this.initialCounter
+      }
+    }
+    -->
+    <!-- 3.2.prop以一种原始的值传入且需要进行转换 -->
+    <!-- 计算属性
+      props: ['size'],
+        computed: {
+        normalizedSize() {
+          return this.size.trim().toLowerCase()
+      }
+    }
+      -->
+</div>
+<script>
+  const App={
+    data(){
+      return {
+        post: {
+          id: 1,
+          title: 'My Journey with me'
+        }
+      }
+    }
+  }
+const BlogPost={
+  props:{
+    title: String,
+    likes: Number,
+    isPublished: Boolean,
+    commentIds: Array,
+    author: Object,
+    callback: Function,
+    contactsPromise: Promise // 或任何其他构造函数
+  }
+}
+
+Vue.createApp().mount('#Props').component(BlogPost)
+</script>
+
+<!-- 4.Prop验证 -->
+<!-- 在组件实例创建前进行验证，Vue会在浏览器控制台中警告你 -->
+<!-- 
+  检查类型 type：
+  String Number Boolean Array Object Date Function Symbol；
+  还可以是自定义的构造函数，并通过instanceof 来进行检查确认
+-->
+<script>
+  const PropValidateApp = {}
+  const propValidate = Vue.createApp(PropValidateApp)
+  function Person(firstName, lastName) {
+      this.firstName = firstName
+      this.lastName = lastName
+  }
+  // 当 prop 验证失败的时候，(开发环境构建版本的) Vue 将会产生一个控制台的警告
+  propValidate.component('my-componenet',{
+    props:{
+      // 基础类型检查( null 和 undefined 值会通过任何类型验证)
+      propA: Number,
+      // 多个可能的类型
+      probB: [String, Number],
+      // 必填的字符串
+      propC: {
+        type: String,
+        required: true
+      },
+      // 带默认值的数字
+      propD: {
+        type: Number,
+        default: 100
+      },
+      // 带有默认值的对象
+      propE: {
+        type: Object,
+        // 对象或数组的默认值必须从一个工厂函数返回
+        default() {
+          return { message: 'hello'}
+        }
+      },
+      // 自定义验证函数
+      propF: {
+        validator(value) {
+          //  这个值必须与下列字符串中的其中一个值相匹配
+          return['success','warning','danger'].includes(value)
+        }
+      },
+      // 具有默认值的函数
+      propG: {
+        type: Function,
+        // 对对象或数组的默认值不通，这不是一个工厂函数，这是一个用作默认值的函数
+        default() {
+          return'Dafalult function'
+        }
+      },
+      author: Person
+    }
+  })
+</script>
+<!-- 5.Prop的大小写命名（camelCase vs kebab-case） -->
+<!-- 
+  HTML 中的 attribute 名是大小写不敏感的，
+  所以浏览器会把所有大写字符解释为小写字符。
+  这意味着当你使用 DOM 中的模板时，camelCase (驼峰命名法) 的 prop 名需要使用其等价的 kebab-case (短横线分隔命名) 命名 
+  如果你使用字符串模板，那么这个限制就不存在了
+-->
+

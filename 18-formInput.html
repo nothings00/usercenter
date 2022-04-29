@@ -1,0 +1,153 @@
+<!-- 表单输入绑定 -->
+
+<script src="https://unpkg.com/vue@next"></script>
+
+<!-- 一、基础用法 -->
+<!-- 
+  v-model 在内部为不同的输入元素使用不同的 property 并抛出不同的事件：
+  text 和 textarea 元素使用 value property 和 input 事件；
+  checkbox 和 radio 使用 checked property 和 change 事件；
+  select 字段将 value 作为 prop 并将 change 作为事件
+ -->
+<div id="base">
+  <!-- 1.文本（Text） -->
+  <input v-model="message" placeholder="edit me"/>
+  <p>Message is : {{ message }}</p>
+  <!-- 2.多行文本（TextArea） -->
+  <span>Multiline message is :</span>
+  <p style="white-space: pre-line;">{{ message }}</p>
+  <br/>
+  <!-- 插值在 textarea 中不起作用，请使用 v-model 来代替。 -->
+  <textarea v-model="message" placeholder="add multiple lines"></textarea>
+  <!-- 3.复选框(Checkbox) -->
+  <!-- 3.1 单复选框 -->
+  <input type="checkbox" id="checkbox" v-model="checked"/>
+  <label for="checkbox">{{ checked }}</label>
+  <!-- 3.2 多复选框 -->
+  <div id="v-model-multiple-checkboxes">
+    <input type="checkbox" id="jack" value="Jack" v-model="checkedNames"/>
+    <label for="jack">Jack</label>
+    <input type="checkbox" id="john" value="John" v-model="checkedNames"/>
+    <label for="john">John</label>
+    <input type="checkbox" id="mike" value="Mike" v-model="checkedNames"/>
+    <label for="mike">Mike</label>
+    <br />
+    <span>Checked names: {{ checkedNames }}</span>
+  </div>
+  <!-- 4.单选框 -->
+  <div id="v-model-radiobutton">
+    <input type="radio" id="one" value="One" v-model="picked" />
+    <label for="one">One</label>
+    <br />
+    <input type="radio" id="two" value="Two" v-model="picked" />
+    <label for="two">Two</label>
+    <br />
+    <span>Picked: {{picked}}</span>
+  </div>
+  <!-- 5.选择框 -->
+  <div id="v-model-select" class="demo">
+    <!-- 5.1 单选选择框 -->
+    <select v-model="selected">
+      <option disabled value="">Please select one</option>
+      <option>A</option>
+      <option>B</option>
+      <option>C</option>
+    </select>
+    <span>Selected: {{ selected }}</span>
+    <!-- 5.2 多选选择框 -->
+    <br />
+    <select v-model="selected" multiple>
+      <option>A</option>
+      <option>B</option>
+      <option>C</option>
+    </select>
+    <br />
+    <span>Selected: {{ selected }}</span>
+    <!-- 5.3 v-for渲染动态选项 -->
+    <br />
+    <select v-model="selected">
+      <option v-for="option in options" :value="option.value" >
+        {{ option.text }}
+      </option>
+    </select>
+    <span>Selected: {{ selected }} </span>
+  </div>
+  
+  
+</div>
+<script>
+  const BaseApp ={
+    data(){
+      return {
+        message: '',
+        checked: false,
+        checkedNames: [],
+        picked: '',
+        selected: '',
+        options:[
+          { text: 'One', value: 'A'},
+          { text: 'Two', value: 'B'},
+          { text: 'Three', value: 'C'}
+        ]
+      }
+    }
+  }
+  Vue.createApp(BaseApp).mount('#base')
+</script>
+
+<!-- 二、值绑定 -->
+<div id="value-bind">
+  <!-- 当选中时，‘picked’为字符串‘a’ -->
+  <input type="radio" v-model="picked" value="a" />
+  <!-- 'toggle'为true 或 false -->
+  <input type="checkbox" v-model="toggle" />
+  <!-- 当选中第一个选项时，‘selected’ 为字符串 “abc” -->
+  <select v-model="selected">
+    <option value="abc">ABC</option>
+  </select>
+  <br />
+  <!-- 2.1 复选框(Checkbox) -->
+  <input type="checkbox" v-model="toggle" true-value="yes" false-value="no" />
+  <!-- 2.2 单选框（radio） -->
+  <input type="radio" v-model="pick" :value="a" />
+  <!-- 2.3 选择框选项(Select Options) -->
+  <select v-model="selected">
+    <option :value="{ number: 123}">123 </option>
+  </select>
+</div>
+<script>
+  const ValueBindApp={
+    data(){
+      return {
+          picked: '',
+          pick: '',
+          toggle: '',
+          acb: '',
+          selected: ''
+      }
+    }
+  }
+  const vm = Vue.createApp(ValueBindApp).mount('#value-bind')
+</script>
+
+<!-- 三、修饰符 -->
+<div id="modifier">
+<!-- 3.1 .lazy -->
+<!-- 在“change”时而非“input”时更新 -->
+<input v-model.lazy="msg" />
+<!-- 3.2 .number -->
+<input v-model.number="age" />
+<!-- 3.3 .trim -->
+<input v-model.trm="msg" />
+</div>
+<script>
+  const ModifierApp = {
+    data(){
+      return {
+        age: '',
+        msg: ''
+      }
+    }
+  }
+  const modifier = Vue.createApp(ModifierApp).mount('#modifier')
+</script>

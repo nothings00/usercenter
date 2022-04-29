@@ -1,0 +1,33 @@
+<!-- 深入组件 -->
+<script src="https://unpkg.com/vue@next"></script>
+<!-- 一、组件注册 -->
+<div>
+<!-- 1.组件名 -->
+<!-- 全部小写；包含连字符（即多个单词用连字符符号连接） -->
+<!-- 1.1 使用kebab-case -->
+<!-- 使用 kebab-case (短横线分隔命名) 定义一个组件时，你在引用这个自定义元素时也必须使用 kebab-case -->
+<!-- 1.2 使用PascalCase -->
+<!-- PascalCase (首字母大写命名) 定义一个组件时，你在引用这个自定义元素时两种命名法都可以使用 -->
+
+<!-- 2.全局注册-->
+<!-- 
+  Vue.createApp({...}).component('my-component-name', {
+  // ... 选项 ...
+  }) 
+-->
+
+<!-- 3.局部注册 -->
+<!-- 
+  const app = Vue.createApp({
+  components: {
+    'component-a': ComponentA,
+    'component-b': ComponentB
+  }
+})
+ -->
+
+ <!-- 4.模块系统 -->
+ <!-- 在模块系统中局部注册，建议创建一个components目录 -->
+</div>
+<script>
+</script>

@@ -1,0 +1,20 @@
+<script src="https://unpkg.com/vue@next"></script>
+<!-- Provide / Inject -->
+<!-- 用于解决组件层次结构深的问题，父组件为所有子组件的依赖提供者 -->
+<!-- 父组件有一个provide选项来提供数据，子组件有一个inject选项来开始使用这些数据 -->
+
+<!-- 1.处理响应性 -->
+<!-- provide/inject绑定并不是响应式的 -->
+<!-- 可以通过传递一个ref property 或 reactive 对象给provide 来改变这种行为 -->
+<!-- 为provide的属性分配一个组合式API computed -->
+
+<script>
+  app.component('todo-list', {
+  // ...
+  provide() {
+    return {
+      todoLength: Vue.computed(() => this.todos.length)
+    }
+  }
+})
+</script>

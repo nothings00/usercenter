@@ -1,0 +1,118 @@
+<script src="https://unpkg.com/vue@next"></script>
+<!-- 事件处理 -->
+<div id="app">
+  <!-- 1.事件监听 -->
+  <button @click="counter += 1"> Add 1</button>
+  <p>The button above has benn clicked {{ counter }}</p>
+  <br/>
+  <!-- 2.事件处理方法 -->
+  <button @click="greet">Greet</button>
+  <br/>
+  <!-- 3. 内联处理器中的方法 -->
+  <button @click="say('hi')">Say hi</button>
+  <button @click="say('what')">Say what</button>
+  <button @click="warn('Form cannot be submitted yet.',$event)">Submit</button>
+  <br/>
+  <!-- 4.多事件处理器 -->
+  <button @click="one($event),two($event)">Submit</button>
+  <!-- 5.事件修饰符 -->
+  <br/>
+  <!-- 阻止单击事件继续冒泡 -->
+  <a @click.stop="doThis"></a>
+  <!-- 提交事件不再重载页面 https://developer.mozilla.org/zh-CN/docs/Web/API/Event/preventDefault-->
+  <form @submit.prevent = " onSubmit"></form>
+  <!-- 修饰符串联 -->
+  <a @click.stop.prevent ="doThat"></a>
+  <!-- 只有修饰符 -->
+  <form @submit.prevent></form>
+  <!-- 添加事件监听器时使用事件捕获模式 -->
+  <!-- 即内部元素出发的事件先在此处理，然后才叫有内部元素进行处理 -->
+  <div @click.capture="doThis"> ... </div>
+  <!-- 只当event.target 是当前元素自身时出发处理函数 -->
+  <!-- 即事件不是从内部元素出发的 -->
+  <div @click.self="doThat"> ... </div>
+  <!-- 点击事件只会触发一次 -->
+  <a @click.once="doThis"></a>
+  <!-- 滚动事件的默认行为（即滚动行为）将会立即触发 -->
+  <!-- 而不会等待‘onScroll’完成 -->
+  <!-- 以防止气质包含 'event.preventDefault（）'的情况 -->
+  <div @scroll.passive="onScroll"> ...</div>
+
+  <!-- 6.按键修饰符 -->
+  <div>
+    <!-- 6.1 按键修饰符 -->
+    <!-- 直接将 KeyboardEvent.key https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values 
+      暴露的任意有效按键名转换为 kebab-case 来作为修饰符 -->
+    <!-- 只有在‘key’是‘Enter’时调用‘vm.submit()’ -->
+    <input @keyup.enter="submit"/>
+    <!-- 只有‘key’是‘PageDown’时调用 -->
+    <label> pagedown</label>
+    <input @keyup.page-down="onPageDown"/>
+    <!-- 6.2 按键别名 -->
+    <!-- 常用的键有按键别名 .enter .tab .delete .esc .space .up .down left .right -->
+  </div>
+
+  <!-- 7.系统修饰键 -->
+  <div>
+    <!-- 7.1 常用修饰键 -->
+    <!-- .ctrl .alt .shift .meta （command）-->
+    <input @keyup.alt.enter="clear"/>
+    <div @click.alt="doSomething"> Do doSomething</div>
+    <!-- 7.2 .exact修饰键 -->
+    <!-- 控制由精确的系统修饰符组合触发的事件 -->
+    <button @click.meta.exact="onMetaCilck">A</button>
+    <!-- 7.3鼠标按钮修饰符 -->
+    <!-- .left .right .middle -->
+    
+  
+
+  </div>
+</div>
+<script>
+  const App = {
+    data(){
+      return {
+        counter: 0,
+        name: 'Vue.js'
+      }
+    },
+    methods:{
+      greet(e){
+        // this指向当前活动实例
+        alert('Hello' + this.name + '!')
+        // e 是原生DOM event
+        if(e){
+          alert(event.target.tagName)
+        }
+      },
+      say(message){
+        alert(message)
+      },
+      warn(message,event){
+        if(event){
+          event.preventDefault()
+        }
+        alert(message)
+      },
+      one(e){
+        alert(e)
+      },
+      two(e){
+        alert(e)
+      },
+      onPageDown(){
+        console.log("pagedown")
+      },
+      doSomething(){
+        console.log("doSomething")
+      },
+      clear(){
+        console.log("clean")
+      },
+      onMetaCilck(){
+        console.log("only meta+click")
+      }
+    }
+  }
+  Vue.createApp(App).mount('#app')
+</script>

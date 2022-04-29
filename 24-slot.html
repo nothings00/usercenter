@@ -1,0 +1,97 @@
+<!-- 插槽 -->
+<script src="https://unpkg.com/vue@next"></script>
+
+<!-- 配合4. -->
+<div>
+  <base-layout>
+    <template v-slot:header>
+      <h1> Here might be a page title </h1>
+    </template>
+    <template v-slot:default>
+      <p>A paragraph for the main content.</p>
+      <p>And Another one.</p>
+    </template>
+    <template v-slot:footer>
+      <p>Here's some contact info</p>
+    </template>
+  </base-layout>
+</div>
+<script>
+// 1.插槽内容
+// 插槽内容含字符串、任何模版代码（HTML、其他组件）
+// 如果template中没有包含<slot>元素，组件起始标签和结束标签之间的任何内容都会被抛弃
+
+// 2.渲染作用域
+// 可以访问与模版其余部分相同的实例property，即相同的“作用域”
+// 父级模板里的所有内容都是在父级作用域中编译的；子模板里的所有内容都是在子作用域中编译的。
+
+// 3.备用内容
+// 可以将备用内容放在<slot> 标签
+/**
+ * <button type=submit>
+ *  <slot>Submit</slot>
+ * </button>
+ */
+
+// 4.具名插槽
+// 需要多个插槽时,使用attribute：name，为不通的插槽分配独立ID，来决定内容渲染位置
+// 不带name的<slot>带有隐含的name“default”
+// v-slot只能添加在<template>上
+/**
+ * <div class="container">
+ * <header>
+ *  <slot name="header"></slot>
+ * </header>
+ * <main>
+ *  <slot></slot>
+ * </main>
+ * <footer>
+ *  <slot name="footer"><slot>
+ * </footer>
+ * </div>
+ */ 
+
+// 5.作用域插槽
+// 绑定在 <slot> 元素上的 attribute 被称为插槽 prop。
+// 现在，在父级作用域中，我们可以使用带值的 v-slot 来定义我们提供的插槽 prop 的名字
+// template:
+// <ul>
+//   <li v-for="( item, index ) in items">
+//     <slot :item="item" :index="index" :another-attribute="anotherAttribute"></slot>
+//   </li>
+// </ul>
+// div:
+// <todo-list>
+//   <template v-slot:default="slotProps">
+//     <i class="fas fa-check"></i>
+//     <span class="green">{{ slotProps.item }}</span>
+//   </template>
+// </todo-list>
+
+// 5.1 独占默认插槽的缩写语法
+// 当被提供的内容只有默认插槽时，组件的标签才可以被当作插槽的模板来使用
+// 不带参数的 v-slot 被假定对应默认插槽
+// 默认插槽的缩写语法不能和具名插槽混用，因为它会导致作用域不明确
+// 只要出现多个插槽，请始终为所有的插槽使用完整的基于 <template> 的语法
+// <todo-list v-slot="slotProps">
+//   <i class="fas fa-check"></i>
+//   <span class="green">{{ slotProps.item }}</span>
+// </todo-list>
+
+// 5.2 解构插槽Prop
+// 作用域插槽的内部工作原理是将你的插槽内容包括在一个传入单个参数的函数里
+// function (slotProps) {
+//   // ... 插槽内容 ...
+// }
+
+// 6. 动态插槽名
+// 动态指令参数也可以用在 v-slot 上，来定义动态的插槽名
+// <base-layout>
+//   <template v-slot:[dynamicSlotName]>
+//     ...
+//   </template>
+// </base-layout>
+
+// 7.具名插槽的缩写
+// v-slot： 替换为字符#
+</script>

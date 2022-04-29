@@ -1,0 +1,85 @@
+<script src="https://unpkg.com/vue@next"></script>
+<!-- 1、列表渲染 -->
+<div id="app">
+  <!-- 1.1 v-for 渲染数组 -->
+  <ul id="array-rendering">
+    <li v-for="item in items">
+      {{ item.message }}
+    </li>
+    <li v-for="item of items">
+      {{ item.message }}
+    </li>
+    <li v-for="(item,index) in items">
+      {{ parentMessage }} - {{ index }} - {{ item.message }}
+    </li>
+  </ul>
+  <!-- 1.2 v-for 渲染对象 -->
+  <ul id="v-for-object" class="demo">
+    <li v-for="value in myObject">
+      {{ value }}
+    </li>
+    <li v-for="(value,name) in myObject">
+      {{ name }}: {{ value }}
+    </li>
+    <li v-for="(value,name,index) in myObject">
+      {{ index }}. {{ name }} :{{ value }}
+    </li>
+  </ul>
+  <!-- 1.3 维护状态 -->
+  <!-- 1.4 数组更新检测 -->
+  <!-- 1.4.1 变更方法 -->
+  <!-- push()、pop()、shift()、unshift()、splice()、sort()、reverse() -->
+  <!-- 1.4.2 替换数组 -->
+  <!-- filter()、concat()、slice() -->
+  <!-- 1.5 显示过滤/排序后的结果 -->
+  <div>
+    <ul>
+      <li v-for=" n in evenNumbers" :key="n"> {{ n }}</li>
+    </ul>
+    <ul v-for=" numbers in sets">
+      <li v-for=" n in even(numbers)" :key="n"> {{ n }} </li>
+    </ul>
+  </div>
+  <!-- 1.6 v-for使用值的范围 -->
+  <div id="range" class="demo">
+    <span v-for = "n in 10" :key="n"> {{ n }}</span>
+  </div>
+  <!-- 1.7 在<template>中使用v-for -->
+  <ul>
+    <template v-for="item in items" :key="item.msg">
+      <li> {{item.message}}</li>
+      <li class="divider" role="presentation"></li>
+    </template>
+  </ul>  
+  <!-- 1.8 不建议v-for与v-if一同使用 -->
+  <!-- 1.9 在组件上使用v-for -->
+  
+</div>
+<script>
+  const App = {
+    data(){
+      return {
+        parentMessage: 'Parent',
+        items:[{message: 'Foo'},{message: 'Bar'}],
+        myObject: {
+          title: 'How to do lists in Vue',
+          author: 'Jane Done',
+          publishedAt: '2016-4-10'
+        },
+        numbers:[ 1,2,3,4,5],
+        sets: [[1,2,3,4,5],[6,7,8,9,10]]
+      }
+    },
+    computed: {
+      evenNumbers() {
+        return this.numbers.filter(number => number % 2 === 0 )
+      }
+    },
+    methods: {
+      even(numbers){
+        return numbers.filter(number => number % 2 === 0)
+      }
+    }
+  }
+  const vm = Vue.createApp(App).mount('#app')
+</script>

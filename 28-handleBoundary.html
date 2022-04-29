@@ -1,0 +1,18 @@
+<script src="https://unpkg.com/vue@next"></script>
+<!-- 处理边界情况 -->
+<!-- 1.控制更新 -->
+<!-- 1.1 强制更新 -->
+<!-- 正常情况下，依赖于Vue的响应系统，不需要手动更新，假如必须手动更新，那么可以使用$forceUpdate -->
+<!-- 1.2 低级静态组件与 v-once -->
+<!-- Vue中渲染春HTML元素的速度非常快，可能有一个包含很多静态内容的组件，可以通过v-once来确保只对其求值一次，然后进行缓存-->
+<!-- 注意：不要过度使用，新人可能会不知道为什么没有正确更新 -->
+<script>
+  app.component('terms-of-service',{
+    template: `
+      <div v-once>
+        <h1>Terms of Service</h1>
+        ... a lot of static content ...
+      </div>
+    `
+  })
+</script>
