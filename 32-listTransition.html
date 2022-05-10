@@ -1,0 +1,246 @@
+<script src="https://unpkg.com/vue@next"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.4/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.3/velocity.min.js"></script>
+<!-- 列表过渡 -->
+<!-- <transition-group> 
+  a.默认情况下，它不会渲染一个包裹元素，但是开通过tag attribute指定渲染一个元素
+  b.过渡模式不可用，不在相互切换特有的元素
+  c.内部元素总是需要提供唯一的key attribute值
+  d.css过渡的类将会应用在内部的元素，而不是这个组/容器本身
+-->
+
+<div id="list-demo">
+  <!-- 1.列表的进入/离开过渡 -->
+  <button @click="add">Add</button>
+  <button @click="remove">Remove</button>
+  <transition-group name="list" tag="p">
+    <span v-for="item in items" :key="item" class="list-item">
+      {{ item }}
+    </span>
+  </transition-group>
+  <div>
+    <button @click="shuffle">Shuffle</button>
+    <!-- 2.列表的移动过渡 -->
+    <!-- v-move类会英语在元素改变定位的过程中 -->
+    <!-- 可以通过name attribute来自定义，也可以通过move-class attribute手动设置 -->
+    <transition-group name="flip-list" tag="ul">
+      <li v-for="item in items" :key="item">
+        {{item}}
+      </li>
+    </transition-group>
+    <br />
+    <transition-group name="list-complete" tag="p">
+      <span v-for="item in items" :key="item" class="list-complete-item">
+        {{ item }}
+      </span>
+    </transition-group>
+  </div>
+  <!-- 3. 列表的交错过渡 -->
+  <!-- 通过data attibute 和 JavaScript通信 可以实现列表的交错过渡 -->
+  <div>
+    <input v-model="query" />
+    <transition-group 
+      name="staggered-fade" 
+      tag="ul" :css="false" 
+      @before-enter="beforeEnter" 
+      @enter="enter"
+      @leave="leave">
+      <li v-for="(item,index) in computedList" :key="item.msg" :data-index="index">
+        {{ item.msg }}
+      </li>
+    </transition-group>
+  </div>
+  <!-- 4.可复用的过渡 -->
+  <!-- 将<transition> 或者 <transition-group> 作为根组件，然后将任何子组件放置其中就可以了 -->
+  <div>
+      <my-special-transition>
+        123345
+      </my-special-transition>
+  </div>
+  <!-- 5.动态过渡 -->
+  <!-- 在 Vue 中即使是过渡也是数据驱动的!-->
+  <div class="demo">
+    Fade In:
+    <input type="range" v-model="fadeInDuration" min="0" :max="maxFadeDuration" />
+    Fade Out:
+    <input type="range" v-model="fadeOutDuration" min="0" :max="maxFadeDuration" />
+    <transition 
+      :css="false"
+      @before-enter="beforeEnter5"
+      @enter="enter5"
+      @leave="leave5"
+    >
+      <p v-if="show">Hello</p>
+    </transition>
+    <button v-if="stop" @click="stop = false; show =false">
+      Start animating
+    </button>
+    <button v-else @click="stop = true">Stop it</button>
+  </div>
+</div>
+
+
+<script>
+  const Demo = {
+    data() {
+      return {
+        items: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        nextNum: 10,
+        query: '',
+        list: [
+          { msg: 'Bruce Ledd' },
+          { msg: 'Jackie chan' },
+          { msg: 'Chuck Norris' },
+          { msg: 'Jet Li' },
+          { msg: 'Kung Fury' }
+        ],
+        show: true,
+        fadeInDuration: 1000,
+        fadeOutDuration: 1000,
+        maxFadeDuration: 1500,
+        stop: true
+
+      }
+    },
+    mounted() {
+      this.show =false
+    },
+    computed: {
+      computedList(){
+        var vm = this
+        return this.list.filter(item => {
+          return item.msg.toLowerCase().indexOf(vm.query.toLowerCase())!== -1
+        })
+      }
+    },
+    methods: {
+      randomIndex() {
+        return Math.floor(Math.random * this.items.length)
+      },
+      add() {
+        this.items.splice(this.randomIndex(), 0, this.nextNum++)
+      },
+      remove() {
+        this.items.splice(this.randomIndex(), 1)
+      },
+      shuffle() {
+        this.items = _.shuffle(this.items)
+      },
+      beforeEnter(el){
+        el.style.opacity = 0
+        el.style.height = 0
+      },
+      enter(el,done){
+        gsap.to(el,{
+          opacity:1,
+          height:'1.6em',
+          delay: el.dataset.index * 0.15,
+          onComplete: done
+        })
+      },
+      leave(el,done) {
+        gsap.to (el,{
+          opacity: 0,
+          height: 0,
+          delay: el.dataset.index * 0.15,
+          onComplete: done
+        })
+      },
+      beforeEnter5(el){
+        el.style.opacity = 0
+      },
+      enter5(el,done){
+        var vm5 = this 
+        Velocity(
+          el,
+          {opacity:1},
+          {
+            duration: this.fadeInDuration,
+            complete: function () {
+              done()
+              if (!vm5.stop) vm5.show = true
+            }
+          }
+        )
+      },
+      leave5(el,done){
+        var vm5 = this 
+        Velocity(
+          el,
+          {opacity:0},
+          {
+            duration: this.fadeOutDuration,
+            complete: function(){
+              done()
+              vm5.show = true
+            }
+          }
+        )
+      }
+    }
+  }
+  const MySpecialTransition ={
+    template:`
+      <transition
+        name="very-special-transition"
+        mode="out-in"
+        @before-enter="beforeEnter"
+        @after-enter="afterEnter"
+      >
+        <slot></slot>
+      </transition>
+    `,
+    methods: {
+      beforeEnter(el){
+        console.log('beforeEnter')
+      },
+      afterEnter(el){
+        console.log(afterEnter)
+      }
+    }
+  }
+  
+  const app = Vue.createApp(Demo)
+  app.component('my-special-transition',MySpecialTransition)
+  const vm = app.mount('#list-demo')
+  
+</script>
+
+<style>
+  .list-item {
+    display: inline-block;
+    margin-right: 10px;
+  }
+
+  .list-enter-active,
+  .list-leave-active {
+    transition: all 1s ease;
+  }
+
+  .lsit-enter-from,
+  .list-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .flip-list-move {
+    transition: transform 0.8s ease;
+  }
+
+  .list-complete-item {
+    transition: all 0.8s ease;
+    display: inline-block;
+    margin-right: 10px;
+  }
+
+  .list-complete-enter-from,
+  .list-complete-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .list-complete-active {
+    position: absolute;
+  }
+</style>

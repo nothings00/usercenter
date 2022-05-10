@@ -1,0 +1,112 @@
+<script src="https://unpkg.com/vue@next"></script>
+<!-- 过渡&动画概述 -->
+<!-- 
+  组件进入和离开 DOM 的钩子，在 CSS 和 JS 中均可用，使用内置的 <transition> 组件。
+  过渡模式，以便你在过渡期间编排顺序。
+  处理多个元素就地更新的钩子，使用 <transition-group> 组件，通过 FLIP 技术来提高性能。
+  使用 watchers 来处理应用中不同状态的过渡。
+-->
+
+
+<div id="demo">
+  <!-- 1.基于class的动画和过渡 -->
+  Push this button todo something you shouldn't be doing: <br />
+  <div :class="{ shake: noActivated}">
+    <button @click=" noActivated = true"> Click me</button>
+    <span v-if="noActivated">Oh no!</span>
+  </div>
+
+  <!-- 2.过渡与Style绑定 -->
+  <div 
+    @mouseover = "xCoordinate"
+    :style = "{backgroundColor: `hsl(${x},80%,59%)`}"
+    class="movearea"
+  >
+    <h3>Move your mouse across the srceen...</h3>
+    <p>x:{{x}}</p>
+  </div>
+  <!-- 3.性能 -->
+  <!-- 3.1 Transform和Opacity -->
+  <!-- 尽可能对元素动画进行硬件加速，使用不触发重绘的property。如：transform和opacity -->
+  <!-- 3.2 硬件加速 -->
+  <!-- 如：perspective、backface-visibility、transform：translateZ(x) 等property让浏览器知道需要硬件加速 -->
+  <!-- 许多像 GreenSock 这样的 JS 库都会默认你需要硬件加速，并在默认情况下应用，所以你不需要手动设置它们 -->
+
+  <!-- 4.时长 -->
+  <!--  0.25s四一个最佳选择，起始动画比结束动画时间稍长一些-->
+
+  <!-- 5.缓动效果 -->
+  <div>
+    <button class="button">
+      {{ message }}
+    </button>
+  </div>
+</div>
+
+<script>
+  const Demo = {
+    data() {
+      return {
+        noActivated: false,
+        x: 0,
+        message: 'Hover Me!'
+      }
+    },
+    methods: {
+      xCoordinate(e){
+        this.x  = e.clientX
+      }
+    }
+  }
+  Vue.createApp(Demo).mount('#demo')
+</script>
+
+<style>
+  .shake {
+    animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    transform: translate3d();
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  @keyframes shake {
+
+    10%,
+    90% {
+      transform: translated3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+      transform: translate3d(2px, 0.0);
+    }
+
+    30%,
+    50%,
+    70% {
+      transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+      transform: translate3d(4px, 0, 0);
+    }
+  }
+
+  .moveare {
+    transition: 0.2s background-color ease;
+  }
+
+  .button {
+    background: #1b8f5a;
+    /* 应用于初始状态，因此此转换将应用于返回状态 */
+    transition: background 0.25s ease-in;
+  }
+
+  .button:hover {
+    background: #3eaf7c;
+    /* 应用于悬停状态，因此在触发悬停时将应用此过渡 */
+    transition: background 0.35s ease-out;
+  }
+
+</style>

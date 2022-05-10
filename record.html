@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<video id="test" autoplay></video>
+<button id="button" onclick="replay()">click</button>
+<script>
+  let mediaRecorder;
+  const recordedChunks = []; // 媒体数据
+  const constraints = {
+    audio: true, 
+    video: {
+      frameRate: 25,
+      height: 720,
+      width: 1280
+    }
+  }
+  const options = {
+    mimeType : "video/webm; codecs = vp9", // 媒体格式
+  } 
+
+  navigator.mediaDevices.getDisplayMedia(constraints).then(stream => {
+      start(stream)
+      // document.getElementById("test").srcObject = stream
+  }).catch(error => {
+      console.log(error)
+  });
+
+  // 开始录制方法
+function start(stream) {
+  // 创建 MediaRecorder 的实例对象，对指定的媒体流进行录制
+  mediaRecorder = new MediaRecorder(stream, options);
+  // 当生成媒体流数据时触发该事件，回调传参 event 指本次生成处理的媒体数据
+  mediaRecorder.ondataavailable = event => {
+     if(event.data.size > 0){
+      recordedChunks.push(event.data); // 存储媒体数据
+      console.log(recordedChunks);
+      download();
+    }
+  };
+  mediaRecorder.start();
+  // demo: to download after 9sec
+  setTimeout(event => {
+    console.log("stopping");
+    mediaRecorder.stop();
+  }, 9000);
+  console.log("************开始录制************")
+};
+
+// 结束录制方法
+function stop() {
+  mediaRecorder.stop();
+  console.log("************录制结束************")
+}
+
+// 回放录制内容
+function replay() {
+  const video = document.getElementById("test");
+  const blob = new Blob(recordedChunks, {type : "video/webm"});
+  video.src = window.URL.createObjectURL(blob);
+  video.srcObject = null;
+  video.controls = true;
+  video.play();
+}
+ 
+//下载数据
+function download() {
+  var blob = new Blob(recordedChunks, {
+    type: "video/webm"
+  });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  document.body.appendChild(a);
+  a.style = "display: none";
+  a.href = url;
+  a.download = "test.webm";
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
+
+</script>
+</html>

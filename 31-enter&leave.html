@@ -1,0 +1,290 @@
+<script src="https://unpkg.com/vue@next"></script>
+<link
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.0/animate.min.css"
+  rel="stylesheet"
+  type="text/css"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.4/gsap.min.js"></script>
+<!-- 进入过渡 & 离开过渡 -->
+<!--  
+  在插入、更新或从 DOM 中移除项时，Vue 提供了多种应用转换效果的方法:
+  自动为 CSS 过渡和动画应用 class；
+  集成第三方 CSS 动画库，例如 animate.css ；
+  在过渡钩子期间使用 JavaScript 直接操作 DOM；
+  集成第三方 JavaScript 动画库。
+-->
+
+<div id="demo">
+  <!-- 1.单元素/组件的过渡 -->
+  <!-- Vue提供了transition的封装组件，在下列情形中，可以给任何元素和组件添加进入/离开过渡 -->
+  <!-- 
+    条件渲染（v-if）
+    条件展示（v-show）
+    动态组件
+    组件根节点
+   -->
+   <button @click="show = !show">
+     Toggle
+   </button>
+
+   <!-- 当插入或删除在包含transition组件中的元素时，Vue会做三点处理
+      1.自动嗅探目标元素是否应用了CSS过渡或动画，如果是，在恰当的时机添加/删除CSS类名
+      2.如果过渡组件提供了JavaScript钩子函数，这些钩子函数在恰当的时机北调用
+      3.如果没有找到JavaScript狗子并且没有检测到CSS过渡/动画，DOM操作（插入/删除）在下一帧中立即执行（浏览器逐帧动画机制）
+  -->
+   <transition name="fade">
+     <p v-if="show">hello</p>
+   </transition>
+
+   <!-- 2. 过渡class -->
+   <!-- 在进入/离开过程中，有6个class切换 
+    1.v-enter-from: 定义进入过渡的开始状态。在元素被插入之前生效，在元素被插入之后的下一帧移除。
+    2.v-enter-active：定义进入过渡生效时的状态。在整个进入过渡的阶段中应用，在元素被插入之前生效，在过渡/动画完成之后移除。可以被用来定义进入过渡的过程时间。延迟和曲线函数。
+    3.v-enter-to；定义进入过渡的结束状态。在元素被插入之后下一帧生效（与此同时v-enter-from被移除），在过渡/动画完成之后移除。
+    4.v-leave-from：定义离开过渡的开始状态。在离开过渡被触发时立刻生效，下一帧被移除。
+    5.v-leave-active：定义离开过渡生效时的状态。在整个离开过渡的阶段中应用，在离开过渡被触发时立刻生效，在过渡/动画完成之后移除。可以用来定义离开过渡的过程时间，延迟和曲线函数。
+    6.v-leave-to：离开过渡的结束状态。在离开过渡被触发之后下一帧生效（与此同时v-leave-from被移除），在过渡/动画完成之后移除。
+  -->
+  <!-- 2.1 css过渡 -->
+  <!-- CSS 过渡是最常用的过渡类型之一 -->
+  <button @click="show = !show">
+    Toggle render
+  </button>
+
+  <transition name="slide-fade">
+    <p v-if="show">hello</p>
+  </transition>
+
+  <!-- 2.2 CSS动画 -->
+  <!-- CSS 动画用法同 CSS 过渡，区别是在动画中 v-enter-from 类在节点插入 DOM 后不会立即移除，而是在 animationend 事件触发时移除 -->
+  <transition name="bounce" :duration="{enter:500, leave:800}">
+    <p v-if="show">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris facilisis
+      enim libero, at lacinia diam fermentum id. Pellentesque habitant morbi 
+      tristique senectus et netus.
+    </p>
+  </transition>
+
+  <!-- 2.3自定义过渡class类名 -->
+  <!-- 
+    可以通过以下attribute来自定义过渡类名，优先级高于普通类名：
+    1. enter-from-class
+    2. enter-active-class
+    3. enter-to-class
+    4. leave-from-class
+    5. leave-active-class
+    6. leave-to-class
+   -->
+   <transition 
+    name="custom-classes-transition"
+    enter-active-class="animate__animated animate__tada"
+    levea-active-class="animate__animated animate__bounceOutRight"
+    :duration="1000"
+    >
+    <p v-if="show"> hello </p>
+   </transition>
+
+   <!-- 2.4 同时使用过渡和动画 -->
+   <!-- 需要使用 type attribute 并设置 animation 或 transition 来显式声明你需要 Vue 监听的类型 -->
+
+   <!-- 2.5 显示的过渡持续时间 -->
+   <!-- 默认情况下，Vue 会等待其在过渡效果的根元素的第一个 transitionend 或 animationend 事件 -->
+   <!-- 一些嵌套的内部元素相比于过渡效果的根元素具有延迟的或更长的过渡效果,用 <transition> 组件上的 duration prop 显式指定过渡持续时间 (以毫秒计)-->
+
+    <!-- 2.6 JavaScript 钩子 -->
+    <!-- 只用 JavaScript 过渡的时候，在 enter 和 leave 钩子中必须使用 done 进行回调。否则，它们将被同步调用，过渡会立即完成 -->
+    <transition
+      @befroe-enter="beforeEnter"
+      @enter="enter"
+      @after-enter="afterEnter"
+      @enter-cancelled="enterCancelled"
+      @before-leave="beforeLeave"
+      @leave="leave"
+      @after-leave="afterLeave"
+      @leave-cancelled="leaveCancelled"
+      :css="false">
+      <p v-if="show">
+        Demo
+      </p>
+    </transition>
+
+  <!-- 3. 初始渲染的过渡 -->
+  <!-- 通过 appear attribute 设置节点在初始渲染的过渡,和进入/离开一样的操作 -->
+  <!-- <transition appear>
+    ...
+  </transition> -->
+
+  <!-- 4.多个元素之间的过渡 -->
+  <!-- 可以通过 v-if/v-else 来完成元素之间的过渡 -->
+  <!-- <transition>
+    <table v-if="item.length >0">
+    </table>
+    <p v-else>Sorry, no items found.</p>
+  </transition> -->
+  
+  <!-- 4.1 过渡模式 -->
+  <!-- 处理更复杂的动作，需要协调进入和离开的状态， Vue 提供了一个非常有用的工具，称之为过渡模式 -->
+  <!-- 
+    in-out: 新元素先进行进入过渡，完成之后当前元素过渡离开。
+    out-in: 当前元素先进行离开过渡，完成之后新元素过渡进入。 
+  -->
+  <transition name="fade" mode="out-in">
+
+  </transition>
+
+  <!-- 5. 多个组件之间的过渡 -->
+  <div>
+    <input v-model="view" type="radio" value="v-a" id="a"><label for="a">A</label>
+    <input v-model="view" type="radio" value="v-b" id="b"><label for="b">B</label>
+    <transition name="component-fade" mode="out-in">
+      <component :is="view"></component>
+    </transition>
+  </div>
+</div>
+
+<script>
+  const Demo = {
+    data(){
+      return {
+        show: true,
+        view: 'v-a'
+      }
+    },
+    components:{
+      'v-a': {
+        template: '<div> ComponentA </div>'
+      },
+      'v-b': {
+        template: '<div> ComponentB </div>'
+      }
+    },
+    methods: {
+      // --------
+      // 进入时
+      // --------
+      beforeEnter(el) {
+        // ...
+        gsap.set(el, {
+          scaleX: 0.8,
+          scaleY: 1.2
+        })
+      }
+       
+      ,
+      // 当与 CSS 结合使用时
+      // 回调函数 done 是可选的
+      enter(el, done) {
+        gsap.to(el, {
+          duration: 1,
+          scaleX: 1.5,
+          scaleY: 0.7,
+          opacity: 1,
+          x: 150,
+          ease: 'elastic.inOut(2.5, 1)',
+          onComplete: done
+        })
+        // done()
+      },
+      afterEnter(el) {
+        // ...
+      },
+      enterCancelled(el) {
+        // ...
+      },
+
+      // --------
+      // 离开时
+      // --------
+
+      beforeLeave(el) {
+        // ...
+      },
+      // 当与 CSS 结合使用时
+      // 回调函数 done 是可选的
+      leave(el, done) {
+        // ...
+        // done()
+        gsap.to(el, {
+          duration: 0.7,
+          scaleX: 1,
+          scaleY: 1,
+          x: 300,
+          ease: 'elastic.inOut(2.5, 1)'
+        })
+        gsap.to(el, {
+          duration: 0.2,
+          delay: 0.5,
+          opacity: 0,
+          onComplete: done
+        })
+      },
+      afterLeave(el) {
+        // ...
+      },
+      // leaveCancelled 只用于 v-show 中
+      leaveCancelled(el) {
+        // ...
+      }
+    }
+  }
+
+  Vue.createApp(Demo).mount('#demo')
+</script>
+
+<style>
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.5s ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
+
+  /* 可以为进入和离开动画设置不同的持续时间和动画函数 */
+  .slide-fade-enter-active {
+    transition: all 0.3s ease-out;
+  }
+
+  .slide-fade-leave-active {
+    transition: all 0.8s cubic-bezier(1,0.5,0.8,1)
+  }
+
+  .slide-fade-enter-from,
+  .slide-fade-leave-to {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+
+  .bounce-enter-active {
+    animation: bounce-in 0.5s ;
+  }
+  .bounce-leave-active {
+    animation: bounce-in 0.5s reverse;
+  }
+  @keyframes bounce-in {
+    0% {
+      transform: scale(0)
+    }
+
+    50% {
+      transform: scale(1.25);
+    }
+
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .component-fade-enter-active,
+  .component-fade-leave-active {
+    transition:opacity 0.3s ease;
+  }
+
+  .component-fade-enter-from,
+  .component-fade-leave-to {
+    opacity: 0;
+  }
+</style>
+

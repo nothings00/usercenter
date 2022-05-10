@@ -1,0 +1,102 @@
+<script src="https://unpkg.com/vue@next"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.4/gsap.min.js"></script>
+<!-- 状态过渡 -->
+<!-- 数据元素本身的动效
+  数字和运算
+  颜色的显示
+  SVG 节点的位置
+  元素的大小和其他的 property
+ -->
+
+ <div id="demo">
+  <!-- 1.状态动画与侦听器 -->
+  <div>
+    <input v-model.number="number" type="number" step="20" />
+    <p> {{ animatedNumber }}</p>
+  </div>
+  <!-- 2.动态状态过渡 -->
+  <!-- 用于支撑状态过渡的数据也可以实时更新 -->
+
+  <!-- 3.把过渡放到组件里 -->
+  <div>
+    <input v-model.number="firstNumber" type="number" step="20" /> +
+    <input v-model.number="secondNumber" type="number" step="20" /> = {{ result}}
+    <p>
+      <animated-integer :value="firstNumber"></animated-integer> +
+      <animated-integer :value="secondNumber"></animated-integer> = 
+      <animated-integer :value="result"></animated-integer>
+    </p>
+  </div>
+  
+  <!-- 4.赋予设计以生命 -->
+  <!-- 因为 SVG 的本质是数据，我们只需要准备好这些生物兴奋、思考或警戒的样例。然后 Vue 就可以辅助完成这几种状态之间的过渡动画，来制作你的欢迎页面、加载指示和更加带有情感的通知提示。 -->
+  <div>
+
+  </div>
+ </div>
+ <script>
+  const Demo = {
+    data(){
+      return {
+        number: 0,
+        tweenedNumber: 0,
+        firstNumber: 20,
+        secondNumber: 40
+      }
+    },
+    computed: {
+      animatedNumber(){
+        return this.tweenedNumber.toFixed(0)
+      },
+      result(){
+        return this.firstNumber + this.secondNumber
+      }
+    },
+    watch: {
+      number(newValue) {
+        gsap.to(this.$data, { duration: 0.5, tweenedNumber: newValue})
+      }
+    }
+  }
+  const app = Vue.createApp(Demo)
+  app.component('animated-integer',{
+    template:'<span> {{ fullValue }} </span>',
+    props: {
+      value: {
+        type: Number,
+        required: true
+      }
+    },
+    data(){
+      return {
+        tweeningValue: 0
+      }
+    },
+    computed: {
+      fullValue() {
+        return Math.floor(this.tweeningValue)
+      }
+    },
+    methods:{
+      tween(nv,ov){
+        gsap.to(this.$data,{
+          duration:0.5,
+          tweeningValue: nv,
+          ease: 'sine'
+        })
+      }
+    },
+    watch:{
+      value(nv,ov){
+        this.tween(nv,ov)
+      }
+    },
+    mounted(){
+      this.tween(this.value,0)
+    }
+  })
+  app.mount('#demo')
+ </script>
+ <style>
+
+ </style>
