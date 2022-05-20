@@ -1,0 +1,33 @@
+<script src="https://unpkg.com/vue@next"></script>
+
+
+<!-- 组合式API -->
+<!-- 介绍 -->
+<!-- 1.什么是组合式API？ -->
+<!-- 将同一个逻辑关注点相关代码收集在一起 -->
+
+<!-- 2.组合式API基础 -->
+<!-- 2.1 setup组件选项 -->
+<!-- 新的setup选项在组件被创建之前执行，一旦props被解析完成，将被作为组合式API的入口 -->
+<!-- PS：在setup中避免使用this，找不到组件实例，setup调用在data property、computed property、methods被解析之前 -->
+<!-- setup选项 接收props和context函数，返回的内容暴露给组件的其余部分（计算属性、方法、生命周期钩子等） -->
+
+<!-- 2.2 带ref的响应式变量 -->
+<!-- 通过ref函数使任何响应式变量在任何地方起作用 -->
+<!-- ref接收参数，并将其包裹在一个带有value property的对象中返回，可以使用value property访问或更改响应式变量的值 -->
+<div>
+
+</div>
+<script type="module">
+  import { ref } from 'vue'
+</script>
+
+<script>
+  
+const counter = ref(0)
+console.log(counter)
+console.log(counter.value)
+
+counter.value++
+console.log(counter.value)
+</script>

@@ -1,0 +1,78 @@
+<script src="https://unpkg.com/vue@next"></script>
+<!-- 生产环境部署 -->
+<!-- 1.开始生产环境陌生 -->
+<!-- 开发环境过程中的检查警告，在生产环境中没有意义，且增大程序负担 -->
+<!-- 1.1 不使用构建工具 -->
+<!-- 使用指定版本号的压缩版 -->
+<!-- 1.2 使用构建工具 -->
+<!-- Vue源码中的process.env.NODE_ENV决定，默认为开发模式 -->
+<!-- 1.2.1 Webpack -->
+<!-- 在Webpack 4+ ，可以使用mode选项-->
+<!-- 
+  module.exports = {
+    mode: 'production'
+  } 
+-->
+
+<!-- 1.2.2 Browserify -->
+<!-- - 将环境变量NODE_ENV设置为“production”作为打包命令。告诉vueify避免引入热重载和开发相关的代码 -->
+<!-- - 将一个全局的envify转换应用到包中。使压缩工具可以删除包裹在环境变量条件块中的Vue源码中的所有警告 
+  NODE_ENV=production browserify -g envify -e main.js | uglifyjs -c -m > build.js -->
+<!-- - Gulp使用envify
+// Use the envify custom module to specify environment variables
+const envify = require('envify/custom')
+
+browserify(browserifyOptions)
+  .transform(vueify)
+  .transform(
+    // Required in order to process node_modules files
+    { global: true },
+    envify({ NODE_ENV: 'production' })
+  )
+  .bundle()
+-->
+<!-- -Grunt和grunt-browserify使用envify
+// Use the envify custom module to specify environment variables
+const envify = require('envify/custom')
+
+browserify: {
+  dist: {
+    options: {
+      // Function to deviate from grunt-browserify's default order
+      configure: (b) =>
+        b
+          .transform('vueify')
+          .transform(
+            // Required in order to process node_modules files
+            { global: true },
+            envify({ NODE_ENV: 'production' })
+          )
+          .bundle()
+    }
+  }
+}
+#
+-->
+
+<!-- 1.2.3 Rollup -->
+<!-- 使用 @rollup/plugin-replace
+const replace = require('@rollup/plugin-replace')
+
+rollup({
+  // ...
+  plugins: [
+    replace({
+      'process.env.NODE_ENV': JSON.stringify( 'production' )
+    })
+  ]
+}).then(...)
+-->
+
+<!-- 2.预编译模版 -->
+<!-- 使用单文件组件，自动执行预编译为渲染函数，而不是原始的字符串模版 -->
+
+<!-- 3.提取组件CSS -->
+<!-- 使用SFC，组件内部CSS会通过JavaScript以<style>标签的形式被动注入。将所有组件css提取到同一个文件中可以避免“无样式内容的闪现”，更好地压缩和缓存css -->
+
+<!-- 4.跟踪运行时错误 -->
+<!-- 组件渲染期间发生运行时错误，会被传递到全局的app.config.errorHandler配置函数 -->

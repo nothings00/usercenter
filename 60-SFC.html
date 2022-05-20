@@ -1,0 +1,31 @@
+<script src="https://unpkg.com/vue@next"></script>
+<!-- 单文件组件 -->
+<!-- 1.介绍 -->
+<!-- Vue单文件组件，*.vue，缩写为SFC；是一种特殊的文件格式，将Vue组件的模版、逻辑与样式封装在单个文件中-->
+<!-- 文件组成由<template>、<script>、<style>组成
+  - <script> 部分是一个标准的JavaScript模块。英国到处一个Vue组件作为其默认导出
+  - <template>部分定义了组件的模版
+  - <style>部分定义了与此组件关联的css  
+-->
+
+<!-- 2.工作原理 -->
+<!-- Vue SFC 是框架指定的文件格式，必须由 @vue/compiler-sfc预编译作为标准的JavaScript和CSS，编译后是一个标准的JavaScript模块，可以像模块一样导入SFC -->
+
+<!-- 3.为什么使用SFC -->
+<!-- 
+  -使用熟悉的HTML、CSS与JavaScript语法编写模块化组件 
+  -预编译模版
+  -组件作用域css
+  -使用Composition API时更符合人体工程学语法 
+  -通过交叉分析模块与脚本进行更多编译时优化
+  -IDE支持模版表达式的自动补全与类型检查
+  -开箱即用的remake更换（HMR）支持
+-->
+<!-- 推介场景
+  - 单页应用 （SPA）
+  - 静态站点生成 （SSG）
+  - 任何重要的前端，其中构建步骤可以得到更好的开发体验（DX）
+-->
+
+<!-- 4.关注点分离怎么样 -->
+<!-- 详见 https://v3.cn.vuejs.org/guide/single-file-component.html 底部-->
